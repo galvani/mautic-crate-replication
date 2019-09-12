@@ -1,0 +1,15 @@
+{
+    "name": "galvani/mautic-crate-replication",
+    "description": "Enables replication of selected data into crateIO for use by segments",
+    "type": "mautic-plugin",
+    "require": {
+        "monolog/monolog": "^2.0@dev"
+    },
+    "authors": [
+        {
+            "name": "Jan Kozak",
+            "email": "galvani78@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
