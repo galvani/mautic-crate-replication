@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CrateReplicationBundle\EventListener;
 
+use MauticPlugin\CrateReplicationBundle\CrateReplicationBundle;
 use MauticPlugin\IntegrationsBundle\Event\FormLoadEvent;
 use MauticPlugin\IntegrationsBundle\IntegrationEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -29,6 +30,11 @@ class ConfigFormLoadSubscriber implements EventSubscriberInterface
      */
     public function onConfigFormLoad(FormLoadEvent $event): void
     {
+        if (CrateReplicationBundle::BUNDLE_NAME !== $event->getIntegrationConfiguration()->getName()) {
+            return;
+        }
 
+        if (!$event->getIntegrationConfiguration()->getIsPublished()) {
+        }
     }
 }

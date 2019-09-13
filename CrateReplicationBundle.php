@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CrateReplicationBundle;
 
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
+use MauticPlugin\CrateReplicationBundle\DependencyInjection\Compiler\TickPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class CrateReplicationBundle extends PluginBundleBase
@@ -23,5 +24,9 @@ class CrateReplicationBundle extends PluginBundleBase
 
     public function build(ContainerBuilder $container)
     {
+        $container->addCompilerPass(new TickPass());
     }
+
+    /** @inheritDoc */
+    public function getParent() {}
 }

@@ -20,9 +20,7 @@ return [
         'events'       => [
             'mautic.integration.crate_replication.subscriber.config_form_load' => [
                 'class'     => \MauticPlugin\CrateReplicationBundle\EventListener\ConfigFormLoadSubscriber::class,
-                'arguments' => [
-                    'mautic.vtiger_crm.cache.field_cache',
-                ],
+                'arguments' => [],
             ],
         ],
         'validators' => [],
@@ -37,6 +35,13 @@ return [
         'helpers'      => [
         ],
         'other'        => [
+            'mautic.integration.crate_replication.tick_provider' => [
+                'class' => \MauticPlugin\CrateReplicationBundle\Tick\TickProvider::class,
+            ],
+            'mautic.integration.crate_replication.tick.page_hits' => [
+                'class' => \MauticPlugin\CrateReplicationBundle\Tick\PageHitTick::class,
+                'tag'   => 'crate_replication.tick'
+            ],
         ],
         'models'       => [
         ],
