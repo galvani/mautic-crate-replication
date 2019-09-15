@@ -13,11 +13,15 @@ class TickPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        if (!$container->has('mautic.crate_replication.tick_manager')) {
+            return;
+        }
+
         $taggedServices     = $container->findTaggedServiceIds('crate_replication.tick');
-        $integrationsHelper = $container->findDefinition('mautic.integration.crate_replication.tick_provider');
+        $tickManager = $container->findDefinition('mautic.crate_replication.tick_manager');
 
         foreach ($taggedServices as $id => $tags) {
-            $integrationsHelper->addMethodCall('add', [new Reference($id)]);
+            $tickManager->addMethodCall('register', [new Reference($id)]);
         }
     }
 }

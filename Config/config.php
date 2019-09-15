@@ -18,14 +18,14 @@ return [
     'author'      => 'Mautic',
     'services'    => [
         'events'       => [
-            'mautic.integration.crate_replication.subscriber.config_form_load' => [
+            'mautic.crate_replication.subscriber.config_form_load' => [
                 'class'     => \MauticPlugin\CrateReplicationBundle\EventListener\ConfigFormLoadSubscriber::class,
                 'arguments' => [],
             ],
         ],
-        'validators' => [],
+        'validators'   => [],
         'forms'        => [
-            'mautic.integration.crate_replication.form.config' => [
+            'mautic.crate_replication.form.config' => [
                 'class'     => \MauticPlugin\CrateReplicationBundle\Form\Type\ConfigFormType::class,
                 'arguments' => [
                     'mautic.integrations.helper'
@@ -35,24 +35,63 @@ return [
         'helpers'      => [
         ],
         'other'        => [
-            'mautic.integration.crate_replication.tick_provider' => [
-                'class' => \MauticPlugin\CrateReplicationBundle\Tick\TickProvider::class,
+            'mautic.crate_replication.tick_manager'  => [
+                'class' => \MauticPlugin\CrateReplicationBundle\Tick\TickManager::class,
+                'calls' => [
+                    [
+                        'method'    => 'setLogger',
+                        'arguments' => ['@logger']
+                    ]
+                ]
             ],
-            'mautic.integration.crate_replication.tick.page_hits' => [
+            'mautic.crate_replication.tick.page_hits' => [
                 'class' => \MauticPlugin\CrateReplicationBundle\Tick\PageHitTick::class,
-                'tag'   => 'crate_replication.tick'
+                'tag'   => 'crate_replication.tick',
+                'arguments' => ['@mautic.crate_replication.factory.entity_manager']
             ],
+            'mautic.crate_replication.listener.doctrine'                => [
+                'class' => \MauticPlugin\CrateReplicationBundle\EventListener\DoctrineListener::class,
+                'tag'  => 'doctrine.event_listener',
+                'tagArguments' => [
+                    'event' => 'postPersist',
+                    'lazy'  => true
+                ],
+                'arguments' => [
+                    'mautic.cache.adapter.redis',
+                    'mautic.crate_replication.settings',
+                    'mautic.crate_replication.tick_manager'
+                ]
+            ],
+            'mautic.crate_replication.settings' => [
+                'class' => \MauticPlugin\CrateReplicationBundle\Config\Settings::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters'
+                ]
+            ],
+            'mautic.crate_replication.connection' => [
+                'class' => \MauticPlugin\CrateReplicationBundle\Crate\Connection::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters'
+                ]
+            ],
+            'mautic.crate_replication.factory.entity_manager' => [
+                'class' => \MauticPlugin\CrateReplicationBundle\Crate\EntityManagerFactory::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters'
+                ]
+            ]
+
         ],
         'models'       => [
         ],
         'integrations' => [
-            'mautic.integration.crate_replication'      => [
-                'class'     => \MauticPlugin\CrateReplicationBundle\Integration\CrateReplicationIntegration::class,
-                'tags'      => [
+            'mautic.crate_replication'        => [
+                'class' => \MauticPlugin\CrateReplicationBundle\Integration\CrateReplicationIntegration::class,
+                'tags'  => [
                     'mautic.basic_integration'
                 ],
             ],
-            'mautic.integration.crate_replication.config' => [
+            'mautic.crate_replication.config' => [
                 'class'     => \MauticPlugin\CrateReplicationBundle\Integration\ConfigProvider::class,
                 'tag'       => 'mautic.config_integration',
                 'arguments' => [],
