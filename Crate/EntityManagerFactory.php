@@ -9,7 +9,6 @@ use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CrateReplicationBundle\Exception\ConfigurationException;
-use MauticPlugin\CrateReplicationBundle\Exception\SchemaException;
 
 class EntityManagerFactory
 {
