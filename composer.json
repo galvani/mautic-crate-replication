@@ -3,7 +3,8 @@
     "description": "Enables replication of selected data into crateIO for use by segments",
     "type": "mautic-plugin",
     "require": {
-        "monolog/monolog": "^2.0@dev"
+        "monolog/monolog": "^2.0@dev", 
+        "mautic/integrations-bundle":"dev-master"
     },
     "authors": [
         {
