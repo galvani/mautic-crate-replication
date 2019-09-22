@@ -5,43 +5,49 @@ namespace MauticPlugin\CrateReplicationBundle\Tick;
 
 use Doctrine\ORM\EntityManager;
 use MauticPlugin\CrateReplicationBundle\Crate\EntityManagerFactory;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-abstract class AbstractTick  implements EventSubscriberInterface, TickInterface
+abstract class AbstractTick implements EventSubscriberInterface, TickInterface
 {
     /**
      * @var EntityManagerFactory
      */
-   private $entityManagerFactory;
+    private $entityManagerFactory;
 
     /**
      * @var ?EntityManager
      */
-   private $entityManager;
+    private $entityManager;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * @param EntityManagerFactory $entityManagerFactory
      */
-   public function __construct(EntityManagerFactory $entityManagerFactory)
-   {
-       $this->entityManagerFactory = $entityManagerFactory;
-   }
+    public function __construct(EntityManagerFactory $entityManagerFactory)
+    {
+        $this->entityManagerFactory = $entityManagerFactory;
+    }
 
     /**
      * @return EntityManager
      * @throws \MauticPlugin\CrateReplicationBundle\Exception\ConfigurationException
      */
-   public function getEntityManager(): EntityManager {
-       if (null===$this->entityManager) {
-           $this->entityManager = $this->entityManagerFactory->getEntityManager();
-       }
+    public function getEntityManager(): EntityManager
+    {
+        if (null === $this->entityManager) {
+            $this->entityManager = $this->entityManagerFactory->getEntityManager();
+        }
 
-       return $this->entityManager;
-   }
+        return $this->entityManager;
+    }
 
 
-
-   /** @inheritDoc */
+    /** @inheritDoc */
     public static function getSubscribedEvents()
     {
         $events = [];
@@ -51,4 +57,23 @@ abstract class AbstractTick  implements EventSubscriberInterface, TickInterface
         return $events;
     }
 
+    /**
+     * @param LoggerInterface $logger
+     *
+     * @return AbstractTick
+     */
+    public function setLogger(LoggerInterface $logger): TickInterface
+    {
+        $this->logger = $logger;
+
+        return $this;
+    }
+
+    /**
+     * @return LoggerInterface
+     */
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
 }

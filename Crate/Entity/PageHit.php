@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @Entity()
- * @ORM\Table(name="page_hits")
+ * @ORM\Table(name="pagehits")
  */
 class PageHit
 {

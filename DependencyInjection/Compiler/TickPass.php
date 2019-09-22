@@ -21,7 +21,7 @@ class TickPass implements CompilerPassInterface
         $tickManager = $container->findDefinition('mautic.crate_replication.tick_manager');
 
         foreach ($taggedServices as $id => $tags) {
-            $tickManager->addMethodCall('register', [new Reference($id)]);
+                $tickManager->addMethodCall('register', [new Reference($id)]);
         }
     }
 }

@@ -35,52 +35,63 @@ return [
         'helpers'      => [
         ],
         'other'        => [
-            'mautic.crate_replication.tick_manager'  => [
+            'mautic.crate_replication.tick_manager'           => [
                 'class' => \MauticPlugin\CrateReplicationBundle\Tick\TickManager::class,
                 'calls' => [
                     [
                         'method'    => 'setLogger',
                         'arguments' => ['@logger']
+                    ],[
+                        'method'    => 'setEntityManager',
+                        'arguments' => ['@mautic.crate_replication.factory.entity_manager']
                     ]
+                ],
+                'arguments' => [
+                    '@logger'
                 ]
             ],
-            'mautic.crate_replication.tick.page_hits' => [
-                'class' => \MauticPlugin\CrateReplicationBundle\Tick\PageHitTick::class,
-                'tag'   => 'crate_replication.tick',
+            'mautic.crate_replication.tick.page_hits'         => [
+                'class'     => \MauticPlugin\CrateReplicationBundle\Tick\PageHitTick::class,
+                'tag'       => 'crate_replication.tick',
                 'arguments' => ['@mautic.crate_replication.factory.entity_manager']
             ],
-            'mautic.crate_replication.listener.doctrine'                => [
-                'class' => \MauticPlugin\CrateReplicationBundle\EventListener\DoctrineListener::class,
-                'tag'  => 'doctrine.event_listener',
+            'mautic.crate_replication.listener.doctrine'      => [
+                'class'        => \MauticPlugin\CrateReplicationBundle\EventListener\DoctrineListener::class,
+                'tag'          => 'doctrine.event_listener',
                 'tagArguments' => [
                     'event' => 'postPersist',
                     'lazy'  => true
                 ],
-                'arguments' => [
+                'arguments'    => [
                     'mautic.cache.adapter.redis',
                     'mautic.crate_replication.settings',
                     'mautic.crate_replication.tick_manager'
                 ]
             ],
-            'mautic.crate_replication.settings' => [
-                'class' => \MauticPlugin\CrateReplicationBundle\Config\Settings::class,
+            'mautic.crate_replication.settings'               => [
+                'class'     => \MauticPlugin\CrateReplicationBundle\Config\Settings::class,
                 'arguments' => [
                     'mautic.helper.core_parameters'
                 ]
             ],
-            'mautic.crate_replication.connection' => [
-                'class' => \MauticPlugin\CrateReplicationBundle\Crate\Connection::class,
+            'mautic.crate_replication.connection'             => [
+                'class'     => \MauticPlugin\CrateReplicationBundle\Crate\Connection::class,
                 'arguments' => [
                     'mautic.helper.core_parameters'
                 ]
             ],
             'mautic.crate_replication.factory.entity_manager' => [
-                'class' => \MauticPlugin\CrateReplicationBundle\Crate\EntityManagerFactory::class,
+                'class'     => \MauticPlugin\CrateReplicationBundle\Crate\EntityManagerFactory::class,
                 'arguments' => [
                     'mautic.helper.core_parameters'
                 ]
-            ]
-
+            ],
+//            'mautic.crate_replication.logger' => [
+//                'class'     => \MauticPlugin\CrateReplicationBundle\Logger\Logger::class,
+//                'arguments' => [
+//                    '@logger'
+//                ]
+//            ]
         ],
         'models'       => [
         ],

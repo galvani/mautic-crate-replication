@@ -4,11 +4,13 @@
 namespace MauticPlugin\CrateReplicationBundle\Crate;
 
 use Crate\PDO\PDO;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CrateReplicationBundle\Exception\ConfigurationException;
+use MauticPlugin\CrateReplicationBundle\Exception\SchemaException;
 
 class EntityManagerFactory
 {
@@ -21,11 +23,33 @@ class EntityManagerFactory
      */
     private $entityManager;
 
+    /**
+     * @var array
+     */
+    private $mappedMetadata = [];
+
+    /**
+     * @var array
+     */
+    private $classMapping = [];
+
+    /**
+     * EntityManagerFactory constructor.
+     *
+     * @param CoreParametersHelper $parametersHelper
+     */
     public function __construct(CoreParametersHelper $parametersHelper)
     {
         $this->parametersHelper = $parametersHelper;
     }
 
+    /**
+     * @return EntityManager
+     * @throws ConfigurationException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @throws \Doctrine\ORM\ORMException
+     */
     public function getEntityManager(): EntityManager
     {
         if (isset($this->entityManager)) {
@@ -51,26 +75,18 @@ class EntityManagerFactory
         $config = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode);
 
         $this->entityManager = EntityManager::create($params, $config);
-        //var_dump($this->getMetadata()); die();
-        //var_dump($config->getAutoGenerateProxyClasses()); die();
-        $this->showSchemas();
-        //$this->showTables();
-        //$this->entityManager->getClassMetadata()->
-        //$this->createTableSQLFromSc
-        //hema('mautic', $this->getSchemaManager()->m)
 
-        $dsn = explode('/', $this->parametersHelper->getParameter('crate')['dsn']); //@todo move to settings
-        echo $schemaName = array_pop($dsn);
-        echo "\n";
-        $this->createSchema($schemaName);
-        die();
+        $dsn        = explode('/', $this->parametersHelper->getParameter('crate')['dsn']); //@todo move to settings
+        $schemaName = array_pop($dsn);
+        $this->createSchema($schemaName);   // @todo not always
+
         return $this->entityManager;
     }
 
-    private $mappedMetadata = [];
-    private $classMapping   = [];
-
-    public function getMetadata()
+    /**
+     * @return array
+     */
+    public function getMetadata(): array
     {
         if (count($this->mappedMetadata)) {
             return $this->mappedMetadata;
@@ -86,56 +102,87 @@ class EntityManagerFactory
         return $this->mappedMetada;
     }
 
-
-    public function getSchemaManager()
+    /**
+     * @return AbstractSchemaManager
+     * @throws ConfigurationException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function getSchemaManager(): AbstractSchemaManager
     {
         return $this->getEntityManager()->getConnection()->getSchemaManager();
     }
 
-    private function createSchema(string $name)
+    /**
+     * @param string $name
+     *
+     * @return void affected rows
+     * @throws ConfigurationException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @throws \Doctrine\ORM\ORMException
+     */
+    private function createSchema(string $name): void
     {
-        $existing = $this->showSchemas();
+        $existing = $this->showTables($name);
         /** @var ClassMetadata $metadata */
         foreach ($this->getMetadata() as $table => $metadata) {
-            if (in_array($table, $existing)) {
+            if (in_array(strtolower($table), $existing, true)) {
                 continue;
             }
-            $sql = $this->createTableSQLFromSchema($metadata);
-            var_dump($sql);
+            $sql = $this->createTableSQLFromSchema($metadata, $name);
             $this->getEntityManager()->getConnection()->exec($sql);
         }
-
-        $this->showSchemas();
     }
 
+    /**
+     * @param $query
+     *
+     * @return array
+     * @throws ConfigurationException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @throws \Doctrine\ORM\ORMException
+     */
     private function fetchAll($query): array
     {
         $stmt = $this->getEntityManager()->getConnection()->prepare($query);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    private function showSchemas()
-    {
-        $databases = $this->fetchAll('show schemas');
-        $response  = array_map(function ($item) {
-            return $item['schema_name'];
-        }, $databases);
-        return $response;
-    }
-
+    /**
+     * @param string|null $schema
+     * @param string|null $like
+     *
+     * @return array
+     * @throws ConfigurationException
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @throws \Doctrine\ORM\ORMException
+     */
     private function showTables(?string $schema = null, ?string $like = null): array
     {
         $tables = $this->fetchAll('show tables' . ($schema ? ' in ' . $schema : ''));
-        var_dump($tables);
-        die();
+        $tables = array_map(function($el){
+            return array_shift($el);
+        },$tables);
+        return $tables;
     }
 
-    private function createTableSQLFromSchema(ClassMetadata $schema, ?string $schemaName=null): string
+    /**
+     * @param ClassMetadata $schema
+     * @param string|null   $schemaName
+     *
+     * @return string
+     * @throws \Doctrine\ORM\Mapping\MappingException
+     */
+   private function createTableSQLFromSchema(ClassMetadata $schema, ?string $schemaName = null): string
     {
         $fields = [];
-        $sql = "CREATE TABLE "
-            . ($schemaName!==null ? $schemaName .'.' : '')
-            . $schema->getTableName() . " (";
+        $sql    = "CREATE TABLE "
+            . ($schemaName !== null ? $schemaName . '.' : '')
+            . strtolower($schema->getTableName()) . " (";
         foreach ($schema->getFieldNames() as $fieldName) {
 
             $fieldMapping = $schema->getFieldMapping($fieldName);
@@ -146,7 +193,7 @@ class EntityManagerFactory
             );
 
             $sqlF .= $fieldMapping['unique'] ? ' primary key' : '';
-            $sqlF .= $fieldMapping['nullable']===true ? ' not null' : '';
+            $sqlF .= $fieldMapping['nullable'] === true ? ' not null' : '';
 
             $fields[] = $sqlF;
         }
@@ -154,13 +201,4 @@ class EntityManagerFactory
 
         return $sql;
     }
-
-    public function listTables()
-    {
-        $this->getSchemaManager()->listDatabases(); // => ['foo', 'bar'];
-        foreach ($this->getSchemaManager()->listTables() as $table) {
-            echo $table->getName() . "\n";
-        }
-    }
-
 }

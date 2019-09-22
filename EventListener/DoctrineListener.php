@@ -26,6 +26,13 @@ class DoctrineListener implements EventSubscriber
      */
     private $tickManager;
 
+    /**
+     * DoctrineListener constructor.
+     *
+     * @param RedisTagAwareAdapter $cache
+     * @param Settings             $settings
+     * @param TickManager          $tickProvider
+     */
     public function __construct(RedisTagAwareAdapter $cache, Settings $settings, TickManager $tickProvider)
     {
         $this->cache       = $cache;

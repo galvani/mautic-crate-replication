@@ -22,6 +22,7 @@ class PageHitTick extends AbstractTick
 
     public function parse(DoctrineLifecycleEvent $event): void
     {
+        var_dump($event);
         $hit = new PageHit();
         $hit->id = 1;
         $hit->leadId = 1;
@@ -31,6 +32,7 @@ class PageHitTick extends AbstractTick
         $this->getEntityManager()->flush();
 
         $this->getEntityManager()->getConnection()->commit();
+
         var_dump($this->getEntityManager()->getClassMetadata(PageHit::class));
         var_dump($event);
         // TODO: Implement parse() method.
