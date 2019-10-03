@@ -67,7 +67,7 @@ class DoctrineListener implements EventSubscriber
     {
         $this->index($args);
 
-        
+
     }
 
     /**
