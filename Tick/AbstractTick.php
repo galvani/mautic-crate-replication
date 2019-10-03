@@ -4,7 +4,10 @@
 namespace MauticPlugin\CrateReplicationBundle\Tick;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMInvalidArgumentException;
+use MauticPlugin\CrateReplicationBundle\Crate\Entity\CrateEntity;
 use MauticPlugin\CrateReplicationBundle\Crate\EntityManagerFactory;
+use MauticPlugin\CrateReplicationBundle\Events\DoctrineLifecycleEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -55,6 +58,11 @@ abstract class AbstractTick implements EventSubscriberInterface, TickInterface
             $events[$entity] = 'parse';
         }
         return $events;
+    }
+
+    public function handle(DoctrineLifecycleEvent $event) {
+        $crateEntity = $this->parse($event->getLifecycleEventArgs()->getObject());
+        $this->getEntityManager()->persist($crateEntity);
     }
 
     /**

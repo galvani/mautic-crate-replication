@@ -48,7 +48,7 @@ class TickManager implements \Iterator, \Countable
             $value->setLogger($this->logger);
             $this->eventDispatcher->addListener(
                 $entity,
-                [$value, 'parse']
+                [$value, 'handle']
             );
             $this->values[$entity][$value->getName()] = $value;
         }

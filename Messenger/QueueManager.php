@@ -1,7 +1,7 @@
 <?php
 
 
-namespace MauticPlugin\CrateReplicationBundle\Queue;
+namespace MauticPlugin\CrateReplicationBundle\Messenger;
 
 
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;

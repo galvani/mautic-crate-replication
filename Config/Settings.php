@@ -32,10 +32,10 @@ class Settings
         $this->parametersHelper = $parametersHelper;
     }
 
-    public function getCacheNamespace() {
+    public function getCacheNamespace(): string {
         return 'integration.crate';
     }
-    public function getReplicationQueueCachePath() {
+    public function getReplicationQueueCachePath():string {
         return 'replication.inbox';
     }
 
@@ -54,5 +54,9 @@ class Settings
                 );
         }
         return $this->cache;
+    }
+
+    public function getMessenger() {
+
     }
 }

@@ -66,6 +66,8 @@ class DoctrineListener implements EventSubscriber
     public function postPersist(LifecycleEventArgs $args): void
     {
         $this->index($args);
+
+        
     }
 
     /**
@@ -73,6 +75,7 @@ class DoctrineListener implements EventSubscriber
      */
     public function index(LifecycleEventArgs $args): void
     {
+        var_dump($this->tickManager->getEventDispatcher()->getListeners());
         $this->tickManager->getEventDispatcher()->dispatch(
             get_class($args->getObject()),
             new DoctrineLifecycleEvent($args)

@@ -50,10 +50,19 @@ return [
                     '@logger'
                 ]
             ],
-            'mautic.crate_replication.tick.page_hits'         => [
+            'mautic.crate_replication.factory.contact'         => [
+                'class'     => \MauticPlugin\CrateReplicationBundle\Tick\Factory\ContactFactory::class
+            ],
+
+            'mautic.crate_replication.tick.page_hit'         => [
                 'class'     => \MauticPlugin\CrateReplicationBundle\Tick\PageHitTick::class,
                 'tag'       => 'crate_replication.tick',
                 'arguments' => ['@mautic.crate_replication.factory.entity_manager']
+            ],
+            'mautic.crate_replication.tick.contact'         => [
+                'class'     => \MauticPlugin\CrateReplicationBundle\Tick\ContactTick::class,
+                'tag'       => 'crate_replication.tick',
+                'arguments' => ['@mautic.crate_replication.factory.entity_manager','@mautic.crate_replication.factory.contact']
             ],
             'mautic.crate_replication.listener.doctrine'      => [
                 'class'        => \MauticPlugin\CrateReplicationBundle\EventListener\DoctrineListener::class,

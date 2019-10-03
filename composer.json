@@ -1,9 +1,11 @@
 {
     "name": "galvani/mautic-crate-replication",
+    "license": "proprietary",
     "description": "Enables replication of selected data into crateIO for use by segments",
     "type": "mautic-plugin",
     "require": {
-        "monolog/monolog": "^2.0@dev"
+        "monolog/monolog": "^2.0@dev",
+        "symfony/messenger": "^5.0@dev"
     },
     "authors": [
         {

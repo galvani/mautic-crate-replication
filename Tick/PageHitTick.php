@@ -4,6 +4,7 @@
 namespace MauticPlugin\CrateReplicationBundle\Tick;
 
 use Mautic\PageBundle\Entity\Hit;
+use MauticPlugin\CrateReplicationBundle\Crate\Entity\CrateEntity;
 use MauticPlugin\CrateReplicationBundle\Crate\Entity\PageHit;
 use MauticPlugin\CrateReplicationBundle\Events\DoctrineLifecycleEvent;
 
@@ -20,7 +21,7 @@ class PageHitTick extends AbstractTick
         return [Hit::class];
     }
 
-    public function parse(DoctrineLifecycleEvent $event): void
+    public function parse($object): CrateEntity
     {
         var_dump($event);
         $hit = new PageHit();

@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @Entity()
  * @ORM\Table(name="pagehits")
  */
-class PageHit
+class PageHit extends CrateEntity
 {
     /**
      * @Id
