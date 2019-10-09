@@ -1,6 +1,6 @@
 {
     "name": "galvani/mautic-crate-replication",
-    "license": "proprietary",
+    "license": "GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html",
     "description": "Enables replication of selected data into crateIO for use by segments",
     "type": "mautic-plugin",
     "require": {
